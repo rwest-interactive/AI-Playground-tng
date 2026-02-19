@@ -23,7 +23,7 @@ import type { ModelPaths } from '@/assets/js/store/models.ts'
 import { addDocumentToRAGList, embedInputUsingRag } from './langchain.ts'
 import type { IndexedDocument, EmbedInquiry } from '@/assets/js/store/textInference.ts'
 import { appSize } from './window.ts'
-import { getAssetPathFromUrl, externalResourcesDir } from './utils.ts'
+import { getAssetPathFromUrl } from './utils.ts'
 import { randomUUID } from 'node:crypto'
 import { mediaInputDir } from './main.ts'
 
@@ -352,4 +352,3 @@ export function setupCoreIpcHandlers(
       })
   })
 }
-

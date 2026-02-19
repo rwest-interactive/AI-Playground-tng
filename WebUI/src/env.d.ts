@@ -111,6 +111,12 @@ type electronAPI = {
     }) => void,
   ): void
   wakeupComfyUIService(): void
+  ensureComfyUIBackendRunning(): Promise<{
+    success: boolean
+    restarted?: boolean
+    starting?: boolean
+    error?: string
+  }>
   getComfyUiDefaultParameters(): Promise<string>
   getServices(): Promise<ApiServiceInformation[]>
   updateServiceSettings(settings: ServiceSettings): Promise<BackendStatus>
