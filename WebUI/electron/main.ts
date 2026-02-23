@@ -120,7 +120,6 @@ function initEventHandlers() {
     path.join(externalRes, app.isPackaged ? 'model_config.json' : 'model_config.dev.json'),
   )
 
-  setupDisplayMetricsListener(win)
   setupCoreIpcHandlers(
     pathsManager,
     getSettings(),
@@ -140,7 +139,7 @@ function initEventHandlers() {
 app.whenReady().then(async () => {
   if (await needAdminPermission(externalRes)) {
     if (singleInstanceLock) app.releaseSingleInstanceLock()
-    const message = `start "" "${process.argv.join(' ').trim()}`
+    const message = `start "" "${process.argv.join(' ').trim()}"`
     sudo.exec(message, () => {
       app.exit(0)
     })
@@ -165,15 +164,23 @@ app.whenReady().then(async () => {
       let decodedUrl = decodeURIComponent(request.url.replace(/^aipg-media:\/\//i, ''))
       // Remove trailing slashes that might cause issues
       decodedUrl = decodedUrl.replace(/\/+$/, '')
-      const fullPath = path.join(mediaDir, decodedUrl)
-      const normalizedPath = path.normalize(fullPath)
-      // Convert Windows path to file:// URL format
-      const fileUrl = normalizedPath.replace(/\\/g, '/')
+      const resolvedMediaDir = path.resolve(mediaDir)
+      const resolvedPath = path.resolve(resolvedMediaDir, decodedUrl)
 
+      // Block path traversal attempts
+      const relative = path.relative(resolvedMediaDir, resolvedPath)
+      if (relative.startsWith('..') || path.isAbsolute(relative)) {
+        appLogger.error(`Path traversal blocked: ${resolvedPath}`, 'aipg-media')
+        return new Response('Forbidden', { status: 403 })
+      }
+
+      // Convert Windows path to file:// URL format
+      const fileUrl = resolvedPath.replace(/\\/g, '/')
       return await net.fetch(`file:///${fileUrl}`)
     })
 
     win = await createWindow(settings)
+    setupDisplayMetricsListener(win)
 
     appLogger.info('Detecting all available devices...', 'electron-main')
     const { detectAllDevices } = await import('./subprocesses/globalDeviceDetection.ts')
