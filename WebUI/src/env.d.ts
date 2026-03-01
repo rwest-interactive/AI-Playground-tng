@@ -435,7 +435,6 @@ type BackendServiceName =
   | 'comfyui-backend'
   | 'llamacpp-backend'
   | 'openvino-backend'
-  | 'ollama-backend'
 
 type InferenceDevice = {
   id: string
@@ -468,10 +467,10 @@ type ApiServiceInformation = {
 
 type Model = {
   name: string
-  type: 'undefined' | 'embedding' | 'openVINO' | 'llamaCPP' | 'ollama'
+  type: 'undefined' | 'embedding' | 'openVINO' | 'llamaCPP'
   default: boolean
   downloaded?: boolean | undefined
-  backend?: 'openVINO' | 'llamaCPP' | 'ollama' | undefined
+  backend?: 'openVINO' | 'llamaCPP' | undefined
   supportsToolCalling?: boolean
   supportsVision?: boolean
   maxContextSize?: number

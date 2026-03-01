@@ -154,8 +154,10 @@ export class LlamaCppBackendService implements ApiService {
    * Updates the cached installed version for inclusion in service info updates.
    */
   private async updateCachedVersion(): Promise<void> {
+    this.appLogger.info(`Updating cached version for ${this.name}`, this.name)
     try {
       const version = await this.getInstalledVersion()
+      this.appLogger.info(`getInstalledVersion: ${version}`, this.name)
       if (version && version.version) {
         this.cachedInstalledVersion = {
           version: version.version,

@@ -100,21 +100,6 @@ const getFormSchema = (backend: BackendServiceName) => {
           .passthrough(),
       )
 
-    case 'ollama-backend':
-      // Ollama: two fields - release tag and version
-      return toTypedSchema(
-        z
-          .object({
-            releaseTag: z
-              .string()
-              .regex(/^v\d+\.\d+\.\d+-\w+$/, 'Must be a valid release tag (e.g. v2.3.0-nightly)'),
-            version: z
-              .string()
-              .regex(/^\d+\.\d+\.\d+[a-z]\d{8}$/, 'Must be a valid version (e.g. 2.3.0b20250630)'),
-          })
-          .passthrough(),
-      )
-
     default:
       return toTypedSchema(z.object({}).passthrough())
   }
@@ -132,7 +117,7 @@ const showReinstall = computed(() => {
   return backendStatus.value !== 'installing' && backendStatus.value !== 'notInstalled'
 })
 const showSettings = computed(() => {
-  return ['comfyui-backend', 'llamacpp-backend', 'openvino-backend', 'ollama-backend'].includes(
+  return ['comfyui-backend', 'llamacpp-backend', 'openvino-backend'].includes(
     props.backend,
   )
 })
@@ -146,8 +131,6 @@ const getVersionPlaceholder = (backend: BackendServiceName) => {
       return 'b6048'
     case 'openvino-backend':
       return '2025.2.0'
-    case 'ollama-backend':
-      return 'v2.3.0-nightly'
     default:
       return ''
   }
@@ -165,8 +148,6 @@ const getVersionDescription = (backend: BackendServiceName) => {
       return (
         i18nState.BACKEND_VERSION_DESCRIPTION_OPENVINO || 'Enter a version number (e.g. 2025.2.0)'
       )
-    case 'ollama-backend':
-      return i18nState.BACKEND_VERSION_DESCRIPTION_OLLAMA || 'Enter release tag and version'
     default:
       return i18nState.BACKEND_VERSION_DESCRIPTION || 'Enter version information'
   }
@@ -264,13 +245,6 @@ function hasVersionChange(serviceName: BackendServiceName): boolean {
   const versionState = backendServices.versionState[serviceName]
   const effectiveTarget = getEffectiveTarget(serviceName)
   if (!effectiveTarget || !versionState.installed) return false
-
-  if (serviceName === 'ollama-backend') {
-    return (
-      versionState.installed.version !== effectiveTarget.version ||
-      versionState.installed.releaseTag !== effectiveTarget.releaseTag
-    )
-  }
 
   // Normalize versions for comparison (handles OpenVINO subversions)
   const installedNorm = normalizeVersionForComparison(
@@ -474,47 +448,7 @@ const showMenuButton = computed(
                 })
               "
             >
-              <!-- Ollama backend has two fields -->
-              <template v-if="backend === 'ollama-backend'">
-                <FormField v-slot="{ componentField }" name="releaseTag">
-                  <FormItem>
-                    <FormLabel>{{ i18nState.BACKEND_RELEASE_TAG || 'Release Tag' }}</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="text"
-                        :placeholder="getVersionPlaceholder(backend)"
-                        v-bind="componentField"
-                      />
-                    </FormControl>
-                    <FormDescription>
-                      {{
-                        i18nState.BACKEND_RELEASE_TAG_DESCRIPTION ||
-                        'Enter the release tag (e.g. v2.3.0-nightly)'
-                      }}
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                </FormField>
-
-                <FormField v-slot="{ componentField }" name="version" class="mt-4">
-                  <FormItem>
-                    <FormLabel>{{ i18nState.BACKEND_VERSION }}</FormLabel>
-                    <FormControl>
-                      <Input type="text" placeholder="2.3.0b20250630" v-bind="componentField" />
-                    </FormControl>
-                    <FormDescription>
-                      {{
-                        i18nState.BACKEND_VERSION_DESCRIPTION_OLLAMA_VERSION ||
-                        'Enter the version number (e.g. 2.3.0b20250630)'
-                      }}
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                </FormField>
-              </template>
-
-              <!-- Other backends have single version field -->
-              <template v-else>
+              <template>
                 <FormField v-slot="{ componentField }" name="version">
                   <FormItem>
                     <FormLabel>{{ i18nState.BACKEND_VERSION }}</FormLabel>

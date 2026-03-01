@@ -31,7 +31,6 @@ const globalDefaultSettings = {
 const chatBackends: BackendServiceName[] = [
   'llamacpp-backend',
   'openvino-backend',
-  'ollama-backend',
 ]
 
 async function stopChatBackend(): Promise<void> {

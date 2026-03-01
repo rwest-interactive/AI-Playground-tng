@@ -136,7 +136,7 @@ const ComfyUiPresetSchema = BasePresetFieldsSchema.extend({
 })
 
 // LLM Backend enum for chat presets
-const LlmBackendEnum = z.enum(['llamaCPP', 'openVINO', 'ollama'])
+const LlmBackendEnum = z.enum(['llamaCPP', 'openVINO'])
 
 // Chat Preset Schema - uses 'backends' array instead of single 'backend'
 const ChatPresetSchema = BasePresetFieldsSchema.omit({ backend: true }).extend({
@@ -603,9 +603,6 @@ export const usePresets = defineStore(
     const chatPresets = computed(() => {
       // Get backend services to check availability
       const backendServices = useBackendServices()
-      const ollamaServiceExists = backendServices.info.some(
-        (s) => s.serviceName === 'ollama-backend',
-      )
       // Check if NPU device is available
       const hasNpuDevice = backendServices.info
         .find((s) => s.serviceName === 'openvino-backend')
@@ -614,14 +611,6 @@ export const usePresets = defineStore(
       return presets.value.filter((p) => {
         if (p.type !== 'chat') return false
         const chatPreset = p as ChatPreset
-        // Filter out ollama-only presets if ollama service doesn't exist
-        if (
-          chatPreset.backends.length === 1 &&
-          chatPreset.backends[0] === 'ollama' &&
-          !ollamaServiceExists
-        ) {
-          return false
-        }
         // Filter out NPU preset if no NPU device available
         if (chatPreset.requiresNpuSupport && !hasNpuDevice) {
           return false
