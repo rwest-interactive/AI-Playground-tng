@@ -1,6 +1,6 @@
 [project]
 name = "aipg-default-backend"
-version = "3.0.3-beta"
+version = "3.1.0-alpha"
 requires-python = "==3.12.*"
 dependencies = [
   "Flask",

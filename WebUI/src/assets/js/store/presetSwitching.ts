@@ -188,8 +188,8 @@ export const usePresetSwitching = defineStore('presetSwitching', () => {
         throw new Error(`Preset not found: ${presetName}`)
       }
 
-      // 2. For chat presets, verify backend availability
-      if (preset.type === 'chat') {
+      // 2. For chat presets, verify backend availability (main shell only — skip during setup wizard)
+      if (preset.type === 'chat' && globalSetup.loadingState === 'running') {
         const chatPreset = preset as ChatPreset
         const hasAvailableBackend = chatPreset.backends.some((b) => isBackendAvailable(b))
 
